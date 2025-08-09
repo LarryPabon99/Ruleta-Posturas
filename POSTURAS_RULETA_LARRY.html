@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Simulación de Posturas - Larry Pabon</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #1b1b1b;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+    }
+    h1 {
+        color: gold;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 5px black;
+    }
+    .container {
+        background-color: rgba(0,0,0,0.85);
+        padding: 20px;
+        border: 3px solid gold;
+        border-radius: 15px;
+        max-width: 500px;
+        margin: auto;
+        box-shadow: 0 0 15px gold;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    select, input {
+        padding: 10px;
+        width: 80%;
+        border: 2px solid gold;
+        border-radius: 10px;
+        font-size: 1em;
+        text-align: center;
+        margin-top: 5px;
+    }
+    button {
+        background-color: gold;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-size: 1.1em;
+        cursor: pointer;
+        color: black;
+        font-weight: bold;
+        box-shadow: 0 0 10px gold;
+    }
+    button:hover {
+        background-color: #ffcc00;
+        box-shadow: 0 0 20px white;
+    }
+    .success {
+        color: lime;
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-top: 15px;
+    }
+    .error {
+        color: red;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    #reiniciarBtn {
+        display: none;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+<h1>♣ ♥ Simulación de Posturas ♠ ♦<br><small>por Larry Pabon</small></h1>
+
+<div class="container">
+    <p id="postura"></p>
+
+    <label>Valor de la ficha (COP):</label>
+    <select id="denominacion">
+        <option value="">Seleccione valor</option>
+        <option value="1000">1000</option>
+        <option value="2000">2000</option>
+        <option value="2500">2500</option>
+        <option value="5000">5000</option>
+        <option value="10000">10000</option>
+        <option value="20000">20000</option>
+        <option value="25000">25000</option>
+        <option value="50000">50000</option>
+        <option value="100000">100000</option>
+    </select>
+
+    <label>Total de la base:</label>
+    <input type="number" id="base" placeholder="Ingrese base">
+
+    <label>Valor total a pagar:</label>
+    <input type="number" id="total" placeholder="Ingrese total en COP">
+
+    <button onclick="verificar()">Verificar</button>
+    <button id="reiniciarBtn" onclick="reiniciar()">Reiniciar simulación</button>
+
+    <p id="mensaje"></p>
+</div>
+
+<script>
+let pagos = { pleno: 35, medio: 17, cuadro: 8, calle: 11, linea: 5, lineaEspecial: 6 };
+let baseCorrecta = 0;
+
+function generarPostura() {
+    let pleno = Math.floor(Math.random() * 4);
+    let medio = Math.floor(Math.random() * 4);
+    let calle = Math.floor(Math.random() * 4);
+    let cuadro = Math.floor(Math.random() * 4);
+    let lineaEspecial = Math.floor(Math.random() * 4);
+    let linea = Math.floor(Math.random() * 4);
+
+    baseCorrecta = (pleno * pagos.pleno) + (medio * pagos.medio) + (cuadro * pagos.cuadro) +
+                   (calle * pagos.calle) + (lineaEspecial * pagos.lineaEspecial) + (linea * pagos.linea);
+
+    document.getElementById("postura").innerHTML = 
+        `Pleno: ${pleno} | Medio: ${medio} | Calle: ${calle} | Cuadro: ${cuadro} | Línea especial: ${lineaEspecial} | Línea: ${linea}`;
+}
+
+function verificar() {
+    let denominacion = parseInt(document.getElementById("denominacion").value);
+    let baseIngresada = parseInt(document.getElementById("base").value);
+    let totalIngresado = parseInt(document.getElementById("total").value);
+    let mensaje = document.getElementById("mensaje");
+
+    if (!denominacion || isNaN(baseIngresada) || isNaN(totalIngresado)) {
+        mensaje.innerHTML = "<span class='error'>Por favor complete todos los campos.</span>";
+        return;
+    }
+
+    let totalCorrecto = baseCorrecta * denominacion;
+
+    if (baseIngresada === baseCorrecta && totalIngresado === totalCorrecto) {
+        mensaje.innerHTML = "<span class='success'>¡Correcto! 🎉</span>";
+        
+        setTimeout(() => {
+            if (confirm("¿Quieres hacer una nueva simulación?")) {
+                generarPostura();
+                document.getElementById("denominacion").value = "";
+                document.getElementById("base").value = "";
+                document.getElementById("total").value = "";
+                mensaje.innerHTML = "";
+            } else {
+                mensaje.innerHTML = "<span class='success'>¡Gracias por practicar! 🎲</span>";
+                document.getElementById("reiniciarBtn").style.display = "inline-block";
+            }
+        }, 300);
+    } else {
+        mensaje.innerHTML = "<span class='error'>Incorrecto, inténtalo de nuevo.</span>";
+    }
+}
+
+function reiniciar() {
+    document.getElementById("reiniciarBtn").style.display = "none";
+    generarPostura();
+    document.getElementById("denominacion").value = "";
+    document.getElementById("base").value = "";
+    document.getElementById("total").value = "";
+    document.getElementById("mensaje").innerHTML = "";
+}
+
+generarPostura();
+</script>
+
+</body>
+</html>
